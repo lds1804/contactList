@@ -9,21 +9,186 @@
     android:fitsSystemWindows="true"
     tools:context="com.example.leandrosoares.democontactlist.MainActivity">
 
-    <android.support.design.widget.AppBarLayout
+
+
+
+
+
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="0dp"
+        sothree:umanoShadowHeight="4dp">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="match_parent">
 
-    </android.support.design.widget.AppBarLayout>
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/AppTheme.AppBarOverlay">
 
-    <include layout="@layout/content_main" />
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            </android.support.design.widget.AppBarLayout>
+
+            <include layout="@layout/content_main" />
+
+
+        </LinearLayout>
+
+
+
+
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:context="com.example.leandrosoares.democontactlist.addContactActivity"
+            tools:showIn="@layout/activity_add_contact">
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@color/colorGray"
+                android:src="@drawable/ic_person"
+
+
+                android:padding="5dp" />
+
+
+            <ImageView
+                android:layout_height="40dp"
+                android:layout_width="40dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="225dp"
+                android:src="@drawable/ic_name"
+
+
+                />
+
+            <EditText
+                android:id="@+id/first_name"
+
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:hint="First Name"
+                android:textSize="20sp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="220dp"
+                android:inputType="text"
+
+                />
+
+            <EditText
+                android:id="@+id/last_name"
+
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:hint="Last Name"
+                android:textSize="20sp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="265dp"
+                android:inputType="text"
+
+                />
+
+
+            <ImageView
+                android:layout_height="35dp"
+                android:layout_width="35dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="320dp"
+                android:src="@drawable/ic_phone_number"
+
+
+                />
+
+            <EditText
+                android:id="@+id/phone_number"
+
+                android:layout_width="250dp"
+
+                android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                android:textSize="20sp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="310dp"
+                android:inputType="phone"
+
+                />
+
+
+            <ImageView
+                android:layout_height="35dp"
+                android:layout_width="35dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="380dp"
+                android:src="@drawable/ic_action_name"
+
+
+                />
+
+            <EditText
+                android:id="@+id/date_birth"
+
+                android:layout_width="250dp"
+
+                android:layout_height="wrap_content"
+                android:hint="Date of Birth"
+                android:textSize="20sp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="370dp"
+                android:inputType="date"
+
+                />
+
+            <ImageView
+                android:layout_height="35dp"
+                android:layout_width="35dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="430dp"
+                android:src="@drawable/ic_zipcode"
+
+
+                />
+
+            <EditText
+                android:id="@+id/zipcode"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:hint="Zip Code"
+                android:textSize="20sp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="420dp"
+                android:inputType="textPostalAddress"
+
+                />
+
+
+
+
+        </RelativeLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

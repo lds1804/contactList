@@ -35,5 +35,7 @@ dependencies {
 
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
+
 
 }
