@@ -101,166 +101,146 @@
                 android:background="@drawable/ic_delete"
                 />
 
-
-
-
-            <ImageView
-                android:id="@+id/name_icon"
-                android:layout_height="40dp"
-                android:layout_width="40dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="230dp"
-                android:src="@drawable/ic_name"
-
-
-                />
-
-            <TextView
-                android:id="@+id/tvFirstName"
-                android:layout_width="250dp"
+            <android.support.v7.widget.CardView
+                android:layout_below="@+id/backgroundProfile"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="2dp"
+                android:padding="5dp"
+                >
 
-                android:textSize="20sp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="235dp"
-
-
-                />
-
-            <View
-                android:layout_below="@+id/tvFirstName"
-                android:layout_width="250dp"
-                android:layout_marginLeft="70dp"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-
-                />
-
-            <TextView
-                android:id="@+id/tvLastName"
-
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="270dp"
+                <ImageView
+                    android:id="@+id/name_icon"
+                    android:layout_height="40dp"
+                    android:layout_width="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_name"
 
 
-                />
+                    />
 
-
-            <View
-                android:layout_below="@+id/tvLastName"
-                android:layout_width="250dp"
-                android:layout_marginLeft="70dp"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-
-                />
-
-
-            <ImageView
-                android:id="@+id/iconPhone"
-                android:layout_height="35dp"
-                android:layout_width="35dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="320dp"
-                android:src="@drawable/ic_phone_number"
-
-
-                />
-
-            <TextView
-                android:id="@+id/tvPhoneNumber"
-
-                android:layout_width="250dp"
-
-                android:layout_height="wrap_content"
-
-                android:textSize="20sp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="325dp"
-
-
-                />
-
-            <View
-                android:layout_below="@+id/tvPhoneNumber"
-                android:layout_width="250dp"
-                android:layout_marginLeft="70dp"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-
-                />
-
-
-            <ImageView
-                android:id="@+id/iconStar"
-                android:layout_height="35dp"
-                android:layout_width="35dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="380dp"
-                android:src="@drawable/ic_action_name"
-
-
-                />
-
-            <TextView
-                android:id="@+id/tvDateBirth"
-
-                android:layout_width="250dp"
-
-                android:layout_height="wrap_content"
-
-                android:textSize="20sp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="385dp"
-
-
-                />
-
-            <View
-                android:layout_below="@+id/tvDateBirth"
-                android:layout_width="250dp"
-                android:layout_marginLeft="70dp"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-
-                />
+                <TextView
+                    android:id="@+id/tvFirstName"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="70dp"
+                    />
 
 
 
-            <ImageView
-                android:id="@+id/iconZipCode"
-                android:layout_height="35dp"
-                android:layout_width="35dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="430dp"
-                android:src="@drawable/ic_zipcode"
+                <TextView
+                    android:id="@+id/tvLastName"
+
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="40dp"
 
 
-                />
-
-            <TextView
-                android:id="@+id/tvZipCode"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-
-                android:textSize="20sp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="432dp"
+                    />
 
 
-                />
 
-            <View
-                android:layout_below="@+id/tvZipCode"
-                android:layout_width="250dp"
-                android:layout_marginLeft="70dp"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
 
-                />
+
+                <ImageView
+                    android:id="@+id/iconPhone"
+                    android:layout_height="35dp"
+                    android:layout_width="35dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="90dp"
+                    android:src="@drawable/ic_phone_number"
+
+
+                    />
+
+                <TextView
+                    android:id="@+id/tvPhoneNumber"
+
+                    android:layout_width="250dp"
+
+                    android:layout_height="wrap_content"
+
+                    android:textSize="20sp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="90dp"
+
+
+                    />
+
+                <!--<View-->
+                    <!--android:layout_below="@+id/tvPhoneNumber"-->
+                    <!--android:layout_width="250dp"-->
+                    <!--android:layout_marginLeft="70dp"-->
+                    <!--android:layout_height="1dp"-->
+                    <!--android:background="@color/colorGray"-->
+
+                    <!--/>-->
+
+
+                <ImageView
+                    android:id="@+id/iconStar"
+                    android:layout_height="35dp"
+                    android:layout_width="35dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="140dp"
+                    android:src="@drawable/ic_action_name"
+
+
+                    />
+
+                <TextView
+                    android:id="@+id/tvDateBirth"
+
+                    android:layout_width="250dp"
+
+                    android:layout_height="wrap_content"
+
+                    android:textSize="20sp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="145dp"
+
+
+                    />
+
+
+
+
+
+                <ImageView
+                    android:id="@+id/iconZipCode"
+                    android:layout_height="35dp"
+                    android:layout_width="35dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="190dp"
+                    android:src="@drawable/ic_zipcode"
+
+
+                    />
+
+                <TextView
+                    android:id="@+id/tvZipCode"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+
+                    android:textSize="20sp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="190dp"
+
+
+                    />
+
+
+
+
+            </android.support.v7.widget.CardView>
+
+
+
 
 
 
