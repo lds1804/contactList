@@ -11,13 +11,24 @@
 
 
     <ImageView
+        android:id="@+id/photoImageView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:background="@color/colorGray"
         android:src="@drawable/ic_person"
-
-
         android:padding="5dp" />
+
+
+    <ImageButton
+        android:id="@+id/photoButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="5dp"
+        android:src="@drawable/ic_photo"
+        android:background="@color/colorGray"
+        />
 
 
     <ImageView

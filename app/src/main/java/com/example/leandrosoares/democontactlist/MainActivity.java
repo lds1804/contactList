@@ -6,7 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -169,6 +172,14 @@ public class MainActivity extends AppCompatActivity {
                 tvDateOfBirth.setText(contact.getDateOfBirth());
                 tvZipCode.setText(contact.getZipCode());
 
+                byte[] photoData=contact.getPhotoByteArray();
+
+
+                if(photoData!=null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(photoData, 0, photoData.length);
+                    backgroundProfile.setImageBitmap(bitmap);
+                }
+
 
                 ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
 
@@ -197,8 +208,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
 
-                if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED))
+
+
+                if (newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED)){
                     fab.setVisibility(View.VISIBLE);
+                    int id = getResources().getIdentifier("com.example.leandrosoares.democontactlist:drawable/" + "ic_person", null, null);
+                    backgroundProfile.setImageResource(id);
+
+                }
+
 
             }
         });

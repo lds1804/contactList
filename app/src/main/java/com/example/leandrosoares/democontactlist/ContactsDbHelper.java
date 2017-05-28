@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class  ContactsDbHelper extends SQLiteOpenHelper {
 
 
+    private static final String BLOB_TYPE = " BLOB";
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
 
@@ -34,7 +35,8 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
                     ContactsContract.contactEntry.COLUMN_LAST_NAME + TEXT_TYPE + COMMA_SEP +
                     ContactsContract.contactEntry.COLUMN_BIRTH + TEXT_TYPE + COMMA_SEP +
                     ContactsContract.contactEntry.COLUMN_PHONE + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_ZIP_CODE + TEXT_TYPE +
+                    ContactsContract.contactEntry.COLUMN_ZIP_CODE + TEXT_TYPE + COMMA_SEP +
+                    ContactsContract.contactEntry.COLUMN_PHOTO + BLOB_TYPE +
                     ") ;";
 
     private static final String SQL_SELECT_ALL_NAMES=
@@ -147,7 +149,9 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
                 ContactsContract.contactEntry.COLUMN_LAST_NAME,
                 ContactsContract.contactEntry.COLUMN_PHONE,
                 ContactsContract.contactEntry.COLUMN_BIRTH,
-                ContactsContract.contactEntry.COLUMN_ZIP_CODE
+                ContactsContract.contactEntry.COLUMN_ZIP_CODE,
+                ContactsContract.contactEntry.COLUMN_PHOTO
+
 
         };
 
@@ -183,11 +187,12 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
             String phoneNumber= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_PHONE));
             String dateBirth= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_BIRTH));
             String zipCode= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_ZIP_CODE));
+            byte[] photoByteArray=c.getBlob(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_PHOTO));
 
             Log.d("Main" , first_name+ " " + last_name);
 
 
-            contact = new Contact(first_name,last_name,dateBirth,phoneNumber,zipCode);
+            contact = new Contact(first_name,last_name,dateBirth,phoneNumber,zipCode,photoByteArray);
 
         }
 

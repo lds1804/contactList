@@ -19,6 +19,8 @@ public final class ContactsContract {
         public static final String COLUMN_PHONE = "phone_number";
         public static final String COLUMN_BIRTH = "date_of_birth";
         public static final String COLUMN_ZIP_CODE = "zip_code";
+        public static final String COLUMN_PHOTO = "photo";
+
 
 
 

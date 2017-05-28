@@ -3,7 +3,11 @@ package com.example.leandrosoares.democontactlist;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 
 import android.support.design.widget.Snackbar;
@@ -13,8 +17,12 @@ import android.text.Layout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class addContactActivity extends AppCompatActivity {
 
@@ -28,10 +36,17 @@ public class addContactActivity extends AppCompatActivity {
 
     private ImageView addContactButton;
     private ImageView returnButton;
+    private ImageView profilePhoto;
+
+    private ImageButton photoButton;
 
     private boolean isNewContact=true;
 
     private int id;
+
+    private int PICK_IMAGE=3;
+
+    byte[] photoByteArray=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +99,19 @@ public class addContactActivity extends AppCompatActivity {
 
         addContactButton= (ImageView) findViewById(R.id.addContactButton);
         returnButton= (ImageView) findViewById(R.id.returnButton);
+        photoButton=(ImageButton)findViewById(R.id.photoButton);
+        profilePhoto=(ImageView)findViewById(R.id.photoImageView);
+
+
+        photoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            }
+        });
 
 
         //Returns to the contacts activity
@@ -124,11 +152,11 @@ public class addContactActivity extends AppCompatActivity {
                     values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, zipCode );
 
 
+                    if(photoByteArray!=null)
+                        values.put(ContactsContract.contactEntry.COLUMN_PHOTO, photoByteArray );
+
                     db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
                     setResult(1);
-
                     finish();
 
                 }
@@ -159,20 +187,14 @@ public class addContactActivity extends AppCompatActivity {
                     setResult(2);
 
                     finish();
-
-
-
-
                 }
 
                 //Fields empty
                 else{
 
                     CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityAddContact);
-
                     Snackbar snackbar = Snackbar
                             .make( layout , "Please fill all the fields", Snackbar.LENGTH_LONG);
-
                     snackbar.show();
 
                 }
@@ -186,4 +208,35 @@ public class addContactActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==3){
+            Uri imageUri = data.getData();
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if(bitmap!=null){
+                profilePhoto.setImageBitmap(bitmap);
+                }
+
+            photoByteArray = getBitmapAsByteArray(bitmap);
+
+
+
+        }
+
+    }
+
+    //Compress the bitmap and returns it as a byte array
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        return outputStream.toByteArray();
+    }
 }
