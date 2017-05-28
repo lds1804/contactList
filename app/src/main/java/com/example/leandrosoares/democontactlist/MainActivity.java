@@ -92,9 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
         context=this;
 
+        //Get preferences to check if it is the first run
         prefs = getSharedPreferences("com.example.leandrosoares.democontactlist", MODE_PRIVATE);
-
-
 
         //Creates database
         mDbContactsHelper = new ContactsDbHelper(this);
@@ -103,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         // Gets the data repository in write mode
         db = mDbContactsHelper.getWritableDatabase();
 
+        //Get all the contacts on the database
         itemsContact=mDbContactsHelper.selectAllContacts(db);
 
         setContentView(R.layout.activity_main);
@@ -114,10 +114,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-
+                //Start activity to add a new contact
                 Intent intent = new Intent( getApplicationContext(), addContactActivity.class);
                 startActivityForResult(intent,MAIN_ACTIVITY);
-
 
             }
         });
@@ -142,14 +141,13 @@ public class MainActivity extends AppCompatActivity {
         editContact= (ImageButton) findViewById(R.id.editContactButton);
 
 
-
+        //Creates and sets the adapter to the listView
         mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
-
         listViewContacts.setAdapter(mContactListAdapter);
 
 
 
-
+        //Sets on click listener on each item of the list view
         listViewContacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
@@ -157,15 +155,14 @@ public class MainActivity extends AppCompatActivity {
                 RowItem rowItem= (RowItem) parent.getItemAtPosition(position);
                 rowID=rowItem.getId();
 
-                Log.d("Main Activity",rowItem.getContactName() + " clicked");
-
+                //Expands the Slide Panel
                 mSlidePanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 
                 fab.setVisibility(View.INVISIBLE);
 
-
                 contact= mDbContactsHelper.selectContact(db,rowID);
 
+                //Fill the fields of the profile panel
                 tvFirstName.setText(contact.getFirstName());
                 tvLastName.setText(contact.getLastName());
                 tvPhoneNumber.setText(contact.getPhoneNumber());
@@ -178,18 +175,12 @@ public class MainActivity extends AppCompatActivity {
                 // generate color based on a key (same key returns the same color), useful for list/grid views
                 int color = generator.getColor(contact.getFirstName()+" "+ contact.getLastName() );
 
+                //Sets the color of the icons to the color generated
                 backgroundProfile.setBackgroundColor(color);
                 nameIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
                 phoneIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
                 starIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
                 zipCodeIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-
-
-
-
-
-
-
 
             }
         });
@@ -201,6 +192,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
+
+            //Makes the floating button visible when Slide panel Collapses
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
 
@@ -211,19 +204,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        //button remove contact clicked
         removeContactMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //Creates dialog
+                //Creates dialog to show options to the user
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("Do you really to remove this contact?");
                 builder.setNegativeButton("No", null);
 
 
-
+                //Sets positive button
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
+
                         mDbContactsHelper.deleteContact(rowID,db);
                         CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityMain);
                         Snackbar snackbar = Snackbar
@@ -239,14 +234,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                 builder.show();
-
-
-
-
-
-
-
-
             }
         });
 
@@ -254,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
         editContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 //Create activity to edit contact
                 Intent intent =new Intent(getApplicationContext(),addContactActivity.class);
@@ -269,11 +255,6 @@ public class MainActivity extends AppCompatActivity {
 
                 startActivityForResult(intent,CONTACT_EDIT);
 
-
-
-
-
-
             }
         });
 
@@ -284,52 +265,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
+        //Return of the activity with code to create new contact
         if(resultCode==1){
 
             CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityMain);
-
             Snackbar snackbar = Snackbar
                     .make( layout , "Contact Added", Snackbar.LENGTH_LONG);
-
             snackbar.show();
 
 
 
 
             itemsContact=mDbContactsHelper.selectAllContacts(db);
-
             mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
-
             listViewContacts.setAdapter(mContactListAdapter);
-
-
-
-
 
         }
 
-
+        //Return of the activity to edit a contact
         if(resultCode==2){
 
             CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityMain);
-
             Snackbar snackbar = Snackbar
                     .make( layout , "Contact Updated", Snackbar.LENGTH_LONG);
-
             snackbar.show();
-
             mSlidePanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-
-
             refreshListView();
-
-
-
         }
 
 
     }
 
+    //Adds dummy contacts to the database
     private void addDummyContactsDB(SQLiteDatabase db) {
 
         ContentValues values = new ContentValues();
@@ -455,6 +423,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //Refreshs the list view on update
     private void refreshListView(){
 
         itemsContact=mDbContactsHelper.selectAllContacts(db);
@@ -471,12 +440,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        //checks if it is the first run
         if (prefs.getBoolean("firstrun", true)) {
-
             addDummyContactsDB(db);
-
             refreshListView();
-
             prefs.edit().putBoolean("firstrun", false).commit();
         }
     }

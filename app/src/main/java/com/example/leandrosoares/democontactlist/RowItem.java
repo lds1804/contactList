@@ -4,7 +4,11 @@ import android.graphics.Bitmap;
 
 /**
  * Created by leandrosoares on 23/05/17.
+ *
+ * Class that represents a item in the list view
  */
+
+
 public class RowItem {
 
     private String contactName;

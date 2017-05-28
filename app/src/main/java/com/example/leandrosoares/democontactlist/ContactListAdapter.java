@@ -22,6 +22,10 @@ import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
 import agency.tango.android.avatarview.views.AvatarView;
 
+
+/**
+ * Adapter used in contact List, it uses a list of RowItem
+ */
 public class ContactListAdapter extends ArrayAdapter<RowItem> {
 
 
@@ -58,18 +62,19 @@ public class ContactListAdapter extends ArrayAdapter<RowItem> {
 
 
 
+        //Generates the drawable with the initial letter and put it on the item of the list
+        //view
 
-            String firstLetter= name.substring(0,1);
+        String firstLetter= name.substring(0,1);
+        ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
 
-            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+        // generate color based on a key (same key returns the same color), useful for list/grid views
+        int color = generator.getColor(name);
 
-            // generate color based on a key (same key returns the same color), useful for list/grid views
-            int color = generator.getColor(name);
+        TextDrawable textDrawable = TextDrawable.builder()
+                .buildRound(firstLetter, color);
 
-            TextDrawable textDrawable = TextDrawable.builder()
-                    .buildRound(firstLetter, color);
-
-            holder.avatar.setImageDrawable(textDrawable);
+        holder.avatar.setImageDrawable(textDrawable);
 
 
 

@@ -2,6 +2,8 @@ package com.example.leandrosoares.democontactlist;
 
 /**
  * Created by leandrosoares on 27/05/17.
+ * This class represents the atributes of a Contact
+ *
  */
 public class Contact {
 

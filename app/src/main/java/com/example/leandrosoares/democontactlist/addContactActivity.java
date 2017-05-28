@@ -55,20 +55,18 @@ public class addContactActivity extends AppCompatActivity {
         titleProfile= (TextView) findViewById(R.id.titleProfile);
 
 
-
-
-        //Get data
+        //Get data from intent if it was called by edit Contact button
 
         Intent intent = getIntent();
 
+        //Has data on intent
         if(intent.hasExtra("firstName")) {
 
             isNewContact=false;
-
             titleProfile.setText("Edit a Contact");
 
 
-
+            //Get data from intent
             String firstName = intent.getStringExtra("firstName");
             String lastName = intent.getStringExtra("lastName");
             String birthday = intent.getStringExtra("birthday");
@@ -106,7 +104,7 @@ public class addContactActivity extends AppCompatActivity {
                 String zipCode= String.valueOf(etZipCode.getText());
                 String dateOfBirth= String.valueOf(etDateOfBirth.getText());
 
-
+                //Fields not empty and called to create a new contact
                 if(!firstName.isEmpty() && !lastName.isEmpty() && !phoneNumber.isEmpty() &&
                         !zipCode.isEmpty() && !dateOfBirth.isEmpty() && isNewContact)
                 {
@@ -117,7 +115,7 @@ public class addContactActivity extends AppCompatActivity {
                     // Gets the data repository in write mode
                     SQLiteDatabase db = mDbContactsHelper.getWritableDatabase();
 
-
+                    //Put the values
                     ContentValues values = new ContentValues();
                     values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,firstName );
                     values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, lastName);
@@ -132,11 +130,6 @@ public class addContactActivity extends AppCompatActivity {
                     setResult(1);
 
                     finish();
-
-
-
-
-
 
                 }
 
@@ -172,6 +165,7 @@ public class addContactActivity extends AppCompatActivity {
 
                 }
 
+                //Fields empty
                 else{
 
                     CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityAddContact);

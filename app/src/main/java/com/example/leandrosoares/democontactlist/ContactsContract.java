@@ -4,6 +4,7 @@ import android.provider.BaseColumns;
 
 /**
  * Created by leandrosoares on 24/05/17.
+ * Class to store table name and columns of the table contacts
  */
 public final class ContactsContract {
     // To prevent someone from accidentally instantiating the contract class,

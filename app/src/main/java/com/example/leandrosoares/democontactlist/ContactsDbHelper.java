@@ -15,6 +15,10 @@ import  com.example.leandrosoares.democontactlist.ContactsContract;
 
 import java.util.ArrayList;
 
+/**
+ * Class responsible to create, update and delete items on the table Contacts
+ */
+
 public class  ContactsDbHelper extends SQLiteOpenHelper {
 
 
@@ -22,7 +26,7 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
     private static final String COMMA_SEP = ",";
 
 
-
+    //Query to create the table
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + ContactsContract.contactEntry.TABLE_NAME + " (" +
                     ContactsContract.contactEntry._ID + " INTEGER PRIMARY KEY," +
@@ -38,13 +42,11 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
                     ContactsContract.contactEntry.COLUMN_LAST_NAME +
                     " FROM " + ContactsContract.contactEntry.TABLE_NAME + ";";
 
+    //Query to delete entries
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ContactsContract.contactEntry.TABLE_NAME;
 
 
-
-
-    // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DemoContacts.db";
 
@@ -65,12 +67,20 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    /**
+     * get all contacts from the table contacts
+     * @param db database to select from
+     * @return
+     */
+
     public ArrayList<RowItem> selectAllContacts(SQLiteDatabase db){
         // Define a projection that specifies which columns from the database
 // you will actually use after this query.
 
         ArrayList<RowItem> items = new ArrayList<RowItem>();
 
+
+        //Set which columns will be selected
         String[] projection = {
                 ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
                 ContactsContract.contactEntry.COLUMN_LAST_NAME,
@@ -80,10 +90,12 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
 
 
-        // How you want the results sorted in the resulting Cursor
+        // Set how the results will be sorted
         String sortOrder =
                 ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME+ " ASC";
 
+
+        //Queries the database
         Cursor c = db.query(
                 ContactsContract.contactEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
@@ -94,12 +106,17 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
                 sortOrder                                 // The sort order
         );
 
+
+        //iterates through the results using cursor and adds to the list items
         while (c.moveToNext()) {
 
             String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
             String last_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_LAST_NAME));
+
             int  id=c.getInt(c.getColumnIndexOrThrow(ContactsContract.contactEntry._ID));
+
             Log.d("Teste", first_name);
+
             String fullName=first_name+ " " + last_name;
 
             RowItem rowItem = new RowItem(fullName,id);
@@ -107,19 +124,24 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         }
 
 
-
-
-
-
         return items;
     }
 
+
+    /**
+     * Returns the contact that corresponds to the given id
+     * @param db database to query
+     * @param id of the contact
+     * @return a contact
+     */
     public Contact selectContact(SQLiteDatabase db, int id){
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
 
        Contact contact = null;
 
+
+        //The fields to be returned
         String[] projection = {
                 ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
                 ContactsContract.contactEntry.COLUMN_LAST_NAME,
@@ -129,21 +151,18 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
         };
 
-
+        //Where clause to be used on the query
         String whereClause =
                 ContactsContract.contactEntry._ID + " = " + " ? " ;
 
 
-
+        //Arguments used on the where clause
         String[] whereArgs = new String[] {
                 String.valueOf(id)
         };
 
 
 
-
-
-        // How you want the results sorted in the resulting Cursor
 
 
         Cursor c = db.query(
@@ -156,6 +175,7 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
                 null                                 // The sort order
         );
 
+        //Store the value of the query on contact
         while (c.moveToNext()) {
 
             String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
@@ -171,14 +191,16 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
         }
 
-
-
-
-
-
         return contact;
+
     }
 
+    /**
+     * Delete a contact from the database
+     * @param id of the contact
+     * @param db database to delete the contact from
+     * @return
+     */
     public int deleteContact(int id, SQLiteDatabase db){
 
         String table = ContactsContract.contactEntry.TABLE_NAME;
