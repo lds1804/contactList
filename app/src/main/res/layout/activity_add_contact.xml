@@ -34,6 +34,7 @@
 
 
             <TextView
+                android:id="@+id/titleProfile"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="Add a new contact"
@@ -50,8 +51,10 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:src="@drawable/ic_ok"
-                android:layout_marginLeft="110dp"
-                android:foregroundGravity="right">
+                android:layout_gravity="right"
+                android:padding="5dp"
+
+                >
 
 
             </ImageView>

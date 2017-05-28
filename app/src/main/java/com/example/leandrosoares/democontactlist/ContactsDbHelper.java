@@ -179,7 +179,15 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         return contact;
     }
 
+    public int deleteContact(int id, SQLiteDatabase db){
 
+        String table = ContactsContract.contactEntry.TABLE_NAME;
+        String whereClause = "_id=?";
+        String[] whereArgs = new String[] { String.valueOf(id) };
+        return db.delete(table, whereClause, whereArgs);
+
+
+    }
 
 
 

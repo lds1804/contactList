@@ -10,11 +10,6 @@
     tools:context="com.example.leandrosoares.democontactlist.MainActivity">
 
 
-
-
-
-
-
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
@@ -72,11 +67,45 @@
                 android:background="@color/colorGray"
                 android:src="@drawable/ic_person"
 
-
                 android:padding="5dp" />
 
 
+
+
+
+
+
+            <ImageButton
+
+                    android:layout_marginLeft="290dp"
+                    android:id="@+id/editContactButton"
+                    android:layout_height="30dp"
+                    android:layout_width="30dp"
+                    android:padding="15dp"
+                    android:background="@drawable/ic_edit"
+
+
+
+                    />
+
+
+
+
+
+            <ImageButton
+                android:id="@+id/menuRemoveContact"
+                android:padding="20dp"
+                android:layout_marginLeft="325dp"
+                android:layout_height="30dp"
+                android:layout_width="30dp"
+                android:background="@drawable/ic_delete"
+                />
+
+
+
+
             <ImageView
+                android:id="@+id/name_icon"
                 android:layout_height="40dp"
                 android:layout_width="40dp"
                 android:layout_marginLeft="15dp"
@@ -131,6 +160,7 @@
 
 
             <ImageView
+                android:id="@+id/iconPhone"
                 android:layout_height="35dp"
                 android:layout_width="35dp"
                 android:layout_marginLeft="20dp"
@@ -165,6 +195,7 @@
 
 
             <ImageView
+                android:id="@+id/iconStar"
                 android:layout_height="35dp"
                 android:layout_width="35dp"
                 android:layout_marginLeft="20dp"
@@ -200,6 +231,7 @@
 
 
             <ImageView
+                android:id="@+id/iconZipCode"
                 android:layout_height="35dp"
                 android:layout_width="35dp"
                 android:layout_marginLeft="20dp"

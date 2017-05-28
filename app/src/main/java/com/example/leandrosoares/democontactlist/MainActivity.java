@@ -1,17 +1,25 @@
 package com.example.leandrosoares.democontactlist;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,10 +39,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     static final int MAIN_ACTIVITY = 1;
+    static final int CONTACT_EDIT = 2;
+
+    private Context context;
 
     private ListView listViewContacts;
 
@@ -55,11 +68,31 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvDateOfBirth;
 
     private ImageView backgroundProfile;
+    private ImageView nameIcon;
+    private ImageView phoneIcon;
+    private ImageView zipCodeIcon;
+    private ImageView starIcon;
+
+
+    private ImageButton removeContactMenuButton;
+    private ImageButton editContact;
+
+    private int rowID;
+
+    private Contact contact;
+
+
+    SharedPreferences prefs = null;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        context=this;
+
+        prefs = getSharedPreferences("com.example.leandrosoares.democontactlist", MODE_PRIVATE);
 
 
 
@@ -69,8 +102,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Gets the data repository in write mode
         db = mDbContactsHelper.getWritableDatabase();
-
-        addDummyContactsDB(db);
 
         itemsContact=mDbContactsHelper.selectAllContacts(db);
 
@@ -100,7 +131,15 @@ public class MainActivity extends AppCompatActivity {
         tvZipCode= (TextView) findViewById(R.id.tvZipCode);
         tvDateOfBirth= (TextView) findViewById(R.id.tvDateBirth);
 
+
         backgroundProfile=(ImageView) findViewById(R.id.backgroundProfile);
+        nameIcon=(ImageView) findViewById(R.id.name_icon);
+        starIcon=(ImageView) findViewById(R.id.iconStar);
+        zipCodeIcon=(ImageView) findViewById(R.id.iconZipCode);
+        phoneIcon=(ImageView) findViewById(R.id.iconPhone);
+
+        removeContactMenuButton= (ImageButton) findViewById(R.id.menuRemoveContact);
+        editContact= (ImageButton) findViewById(R.id.editContactButton);
 
 
 
@@ -116,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                                     int position, long id) {
 
                 RowItem rowItem= (RowItem) parent.getItemAtPosition(position);
-                int rowID=rowItem.getId();
+                rowID=rowItem.getId();
 
                 Log.d("Main Activity",rowItem.getContactName() + " clicked");
 
@@ -125,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 fab.setVisibility(View.INVISIBLE);
 
 
-                Contact contact= mDbContactsHelper.selectContact(db,rowID);
+                contact= mDbContactsHelper.selectContact(db,rowID);
 
                 tvFirstName.setText(contact.getFirstName());
                 tvLastName.setText(contact.getLastName());
@@ -140,6 +179,10 @@ public class MainActivity extends AppCompatActivity {
                 int color = generator.getColor(contact.getFirstName()+" "+ contact.getLastName() );
 
                 backgroundProfile.setBackgroundColor(color);
+                nameIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                phoneIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                starIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                zipCodeIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
 
 
 
@@ -168,7 +211,71 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        removeContactMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                //Creates dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Do you really to remove this contact?");
+                builder.setNegativeButton("No", null);
+
+
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        mDbContactsHelper.deleteContact(rowID,db);
+                        CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityMain);
+                        Snackbar snackbar = Snackbar
+                                .make( layout , "Contact Deleted", Snackbar.LENGTH_LONG);
+
+                        snackbar.show();
+                        refreshListView();
+                        mSlidePanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
+
+
+                    }});
+
+
+                builder.show();
+
+
+
+
+
+
+
+
+            }
+        });
+
+
+        editContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                //Create activity to edit contact
+                Intent intent =new Intent(getApplicationContext(),addContactActivity.class);
+
+                intent.putExtra("firstName",contact.getFirstName());
+                intent.putExtra("lastName",contact.getLastName());
+                intent.putExtra("birthday",contact.getDateOfBirth());
+                intent.putExtra("phone",contact.getPhoneNumber());
+                intent.putExtra("zipcode",contact.getZipCode());
+                intent.putExtra("id", rowID);
+
+
+                startActivityForResult(intent,CONTACT_EDIT);
+
+
+
+
+
+
+            }
+        });
 
 
     }
@@ -187,6 +294,8 @@ public class MainActivity extends AppCompatActivity {
             snackbar.show();
 
 
+
+
             itemsContact=mDbContactsHelper.selectAllContacts(db);
 
             mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
@@ -194,6 +303,25 @@ public class MainActivity extends AppCompatActivity {
             listViewContacts.setAdapter(mContactListAdapter);
 
 
+
+
+
+        }
+
+
+        if(resultCode==2){
+
+            CoordinatorLayout layout= (CoordinatorLayout) findViewById(R.id.activityMain);
+
+            Snackbar snackbar = Snackbar
+                    .make( layout , "Contact Updated", Snackbar.LENGTH_LONG);
+
+            snackbar.show();
+
+            mSlidePanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
+
+            refreshListView();
 
 
 
@@ -325,4 +453,32 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void refreshListView(){
+
+        itemsContact=mDbContactsHelper.selectAllContacts(db);
+
+        mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
+
+        listViewContacts.setAdapter(mContactListAdapter);
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (prefs.getBoolean("firstrun", true)) {
+
+            addDummyContactsDB(db);
+
+            refreshListView();
+
+            prefs.edit().putBoolean("firstrun", false).commit();
+        }
+    }
+
 }
