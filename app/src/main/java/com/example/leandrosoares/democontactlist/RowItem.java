@@ -8,13 +8,13 @@ import android.graphics.Bitmap;
 public class RowItem {
 
     private String contactName;
-    private Bitmap avatar;
+    private int id;
 
 
-    public  RowItem(String contactName, Bitmap avatar){
+    public  RowItem(String contactName, int id){
 
         this.contactName=contactName;
-        this.avatar=avatar;
+        this.id=id;
 
     }
     public String getContactName(){
@@ -22,9 +22,9 @@ public class RowItem {
         return contactName;
     }
 
-    public Bitmap getAvatar(){
+    public int getId(){
 
-        return  avatar;
+        return  id;
 
     }
 

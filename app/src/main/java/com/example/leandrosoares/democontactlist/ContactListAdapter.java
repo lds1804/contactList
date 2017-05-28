@@ -22,13 +22,13 @@ import agency.tango.android.avatarview.IImageLoader;
 import agency.tango.android.avatarview.loader.PicassoLoader;
 import agency.tango.android.avatarview.views.AvatarView;
 
-public class ContactListAdapter extends ArrayAdapter<String> {
+public class ContactListAdapter extends ArrayAdapter<RowItem> {
 
 
     Context context;
 
     public ContactListAdapter(Context context, int resourceId, //resourceId=your layout
-                              ArrayList<String> items) {
+                              ArrayList<RowItem> items) {
         super(context, resourceId, items);
         this.context = context;
     }
@@ -41,7 +41,7 @@ public class ContactListAdapter extends ArrayAdapter<String> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        String name = getItem(position);
+        String name = getItem(position).getContactName();
 
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);

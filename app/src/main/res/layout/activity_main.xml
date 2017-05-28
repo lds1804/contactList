@@ -66,6 +66,7 @@
 
 
             <ImageView
+                android:id="@+id/backgroundProfile"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="@color/colorGray"
@@ -79,35 +80,52 @@
                 android:layout_height="40dp"
                 android:layout_width="40dp"
                 android:layout_marginLeft="15dp"
-                android:layout_marginTop="225dp"
+                android:layout_marginTop="230dp"
                 android:src="@drawable/ic_name"
 
 
                 />
 
-            <EditText
-                android:id="@+id/first_name"
-
+            <TextView
+                android:id="@+id/tvFirstName"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:hint="First Name"
+
                 android:textSize="20sp"
                 android:layout_marginLeft="70dp"
-                android:layout_marginTop="220dp"
-                android:inputType="text"
+                android:layout_marginTop="235dp"
+
 
                 />
 
-            <EditText
-                android:id="@+id/last_name"
+            <View
+                android:layout_below="@+id/tvFirstName"
+                android:layout_width="250dp"
+                android:layout_marginLeft="70dp"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
+
+                />
+
+            <TextView
+                android:id="@+id/tvLastName"
 
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:hint="Last Name"
                 android:textSize="20sp"
                 android:layout_marginLeft="70dp"
-                android:layout_marginTop="265dp"
-                android:inputType="text"
+                android:layout_marginTop="270dp"
+
+
+                />
+
+
+            <View
+                android:layout_below="@+id/tvLastName"
+                android:layout_width="250dp"
+                android:layout_marginLeft="70dp"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
 
                 />
 
@@ -122,17 +140,26 @@
 
                 />
 
-            <EditText
-                android:id="@+id/phone_number"
+            <TextView
+                android:id="@+id/tvPhoneNumber"
 
                 android:layout_width="250dp"
 
                 android:layout_height="wrap_content"
-                android:hint="Phone Number"
+
                 android:textSize="20sp"
                 android:layout_marginLeft="70dp"
-                android:layout_marginTop="310dp"
-                android:inputType="phone"
+                android:layout_marginTop="325dp"
+
+
+                />
+
+            <View
+                android:layout_below="@+id/tvPhoneNumber"
+                android:layout_width="250dp"
+                android:layout_marginLeft="70dp"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
 
                 />
 
@@ -147,19 +174,30 @@
 
                 />
 
-            <EditText
-                android:id="@+id/date_birth"
+            <TextView
+                android:id="@+id/tvDateBirth"
 
                 android:layout_width="250dp"
 
                 android:layout_height="wrap_content"
-                android:hint="Date of Birth"
+
                 android:textSize="20sp"
                 android:layout_marginLeft="70dp"
-                android:layout_marginTop="370dp"
-                android:inputType="date"
+                android:layout_marginTop="385dp"
+
 
                 />
+
+            <View
+                android:layout_below="@+id/tvDateBirth"
+                android:layout_width="250dp"
+                android:layout_marginLeft="70dp"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
+
+                />
+
+
 
             <ImageView
                 android:layout_height="35dp"
@@ -171,17 +209,29 @@
 
                 />
 
-            <EditText
-                android:id="@+id/zipcode"
+            <TextView
+                android:id="@+id/tvZipCode"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:hint="Zip Code"
+
                 android:textSize="20sp"
                 android:layout_marginLeft="70dp"
-                android:layout_marginTop="420dp"
-                android:inputType="textPostalAddress"
+                android:layout_marginTop="432dp"
+
 
                 />
+
+            <View
+                android:layout_below="@+id/tvZipCode"
+                android:layout_width="250dp"
+                android:layout_marginLeft="70dp"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
+
+                />
+
+
+
 
 
 

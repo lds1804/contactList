@@ -4,18 +4,27 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,17 +39,28 @@ public class MainActivity extends AppCompatActivity {
 
     private ContactListAdapter mContactListAdapter;
 
-    private ArrayList<String> namesArray;
-
+    private ArrayList<RowItem> itemsContact;
 
     private SQLiteDatabase db;
 
-
     private ContactsDbHelper mDbContactsHelper;
+
+    private SlidingUpPanelLayout mSlidePanelLayout;
+
+
+    private TextView tvFirstName;
+    private TextView tvLastName;
+    private TextView tvPhoneNumber;
+    private TextView tvZipCode;
+    private TextView tvDateOfBirth;
+
+    private ImageView backgroundProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
 
         //Creates database
@@ -52,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
 
         addDummyContactsDB(db);
 
-        namesArray=mDbContactsHelper.selectAllContacts(db);
+        itemsContact=mDbContactsHelper.selectAllContacts(db);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,19 +93,82 @@ public class MainActivity extends AppCompatActivity {
 
 
         listViewContacts = (ListView) findViewById(R.id.contactsListView);
+        mSlidePanelLayout= (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        tvFirstName= (TextView) findViewById(R.id.tvFirstName);
+        tvLastName= (TextView) findViewById(R.id.tvLastName);
+        tvPhoneNumber= (TextView) findViewById(R.id.tvPhoneNumber);
+        tvZipCode= (TextView) findViewById(R.id.tvZipCode);
+        tvDateOfBirth= (TextView) findViewById(R.id.tvDateBirth);
+
+        backgroundProfile=(ImageView) findViewById(R.id.backgroundProfile);
 
 
 
-
-
-
-
-
-
-
-        mContactListAdapter= new ContactListAdapter(this,R.layout.contact,namesArray);
+        mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
 
         listViewContacts.setAdapter(mContactListAdapter);
+
+
+
+
+        listViewContacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                RowItem rowItem= (RowItem) parent.getItemAtPosition(position);
+                int rowID=rowItem.getId();
+
+                Log.d("Main Activity",rowItem.getContactName() + " clicked");
+
+                mSlidePanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
+                fab.setVisibility(View.INVISIBLE);
+
+
+                Contact contact= mDbContactsHelper.selectContact(db,rowID);
+
+                tvFirstName.setText(contact.getFirstName());
+                tvLastName.setText(contact.getLastName());
+                tvPhoneNumber.setText(contact.getPhoneNumber());
+                tvDateOfBirth.setText(contact.getDateOfBirth());
+                tvZipCode.setText(contact.getZipCode());
+
+
+                ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+
+                // generate color based on a key (same key returns the same color), useful for list/grid views
+                int color = generator.getColor(contact.getFirstName()+" "+ contact.getLastName() );
+
+                backgroundProfile.setBackgroundColor(color);
+
+
+
+
+
+
+
+
+            }
+        });
+
+
+        mSlidePanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+
+                if(newState.equals(SlidingUpPanelLayout.PanelState.COLLAPSED))
+                    fab.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
+
 
 
     }
@@ -104,9 +187,9 @@ public class MainActivity extends AppCompatActivity {
             snackbar.show();
 
 
-            namesArray=mDbContactsHelper.selectAllContacts(db);
+            itemsContact=mDbContactsHelper.selectAllContacts(db);
 
-            mContactListAdapter= new ContactListAdapter(this,R.layout.contact,namesArray);
+            mContactListAdapter= new ContactListAdapter(this,R.layout.contact,itemsContact);
 
             listViewContacts.setAdapter(mContactListAdapter);
 

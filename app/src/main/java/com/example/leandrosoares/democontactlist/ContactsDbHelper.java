@@ -20,6 +20,9 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
+
+
+
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + ContactsContract.contactEntry.TABLE_NAME + " (" +
                     ContactsContract.contactEntry._ID + " INTEGER PRIMARY KEY," +
@@ -62,15 +65,16 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public ArrayList<String> selectAllContacts(SQLiteDatabase db){
+    public ArrayList<RowItem> selectAllContacts(SQLiteDatabase db){
         // Define a projection that specifies which columns from the database
 // you will actually use after this query.
 
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<RowItem> items = new ArrayList<RowItem>();
 
         String[] projection = {
                 ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
-                ContactsContract.contactEntry.COLUMN_LAST_NAME
+                ContactsContract.contactEntry.COLUMN_LAST_NAME,
+                ContactsContract.contactEntry._ID
 
         };
 
@@ -94,8 +98,12 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
             String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
             String last_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_LAST_NAME));
+            int  id=c.getInt(c.getColumnIndexOrThrow(ContactsContract.contactEntry._ID));
             Log.d("Teste", first_name);
-            names.add(first_name+ " " + last_name);
+            String fullName=first_name+ " " + last_name;
+
+            RowItem rowItem = new RowItem(fullName,id);
+            items.add(rowItem);
         }
 
 
@@ -103,8 +111,75 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
 
 
-        return names;
+        return items;
     }
+
+    public Contact selectContact(SQLiteDatabase db, int id){
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+
+       Contact contact = null;
+
+        String[] projection = {
+                ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
+                ContactsContract.contactEntry.COLUMN_LAST_NAME,
+                ContactsContract.contactEntry.COLUMN_PHONE,
+                ContactsContract.contactEntry.COLUMN_BIRTH,
+                ContactsContract.contactEntry.COLUMN_ZIP_CODE
+
+        };
+
+
+        String whereClause =
+                ContactsContract.contactEntry._ID + " = " + " ? " ;
+
+
+
+        String[] whereArgs = new String[] {
+                String.valueOf(id)
+        };
+
+
+
+
+
+        // How you want the results sorted in the resulting Cursor
+
+
+        Cursor c = db.query(
+                ContactsContract.contactEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                whereClause,                                // The columns for the WHERE clause
+                whereArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        while (c.moveToNext()) {
+
+            String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
+            String last_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_LAST_NAME));
+            String phoneNumber= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_PHONE));
+            String dateBirth= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_BIRTH));
+            String zipCode= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_ZIP_CODE));
+
+            Log.d("Main" , first_name+ " " + last_name);
+
+
+            contact = new Contact(first_name,last_name,dateBirth,phoneNumber,zipCode);
+
+        }
+
+
+
+
+
+
+        return contact;
+    }
+
+
 
 
 
