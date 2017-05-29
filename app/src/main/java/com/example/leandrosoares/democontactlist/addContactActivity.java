@@ -97,8 +97,11 @@ public class addContactActivity extends AppCompatActivity {
             id= intent.getIntExtra("id",-1);
             byte[] photoByteArray= intent.getByteArrayExtra("photo");
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.length);
-            photoImageView.setImageBitmap(bitmap);
+
+            if(photoByteArray!=null) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.length);
+                photoImageView.setImageBitmap(bitmap);
+            }
 
             etFirstName.setText(firstName);
             etLastName.setText(lastName);
@@ -261,7 +264,7 @@ public class addContactActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==3 ){
+        if(requestCode==3 && data != null){
             Uri imageUri = data.getData();
             Bitmap bitmap = null;
             try {
@@ -280,16 +283,17 @@ public class addContactActivity extends AppCompatActivity {
 
         }
 
-        if(requestCode==4){
+        if(requestCode==4&& data != null) {
+
 
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             profilePhoto.setImageBitmap(imageBitmap);
 
             photoByteArray = getBitmapAsByteArray(imageBitmap);
-
-
         }
+
+
 
     }
 
