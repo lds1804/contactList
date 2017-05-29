@@ -1,9 +1,11 @@
 package com.example.leandrosoares.democontactlist;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Layout;
@@ -42,9 +45,12 @@ public class addContactActivity extends AppCompatActivity {
 
     private boolean isNewContact=true;
 
+    private ImageView photoImageView;
+
     private int id;
 
     private int PICK_IMAGE=3;
+    final int REQUEST_IMAGE_CAPTURE = 4;
 
     byte[] photoByteArray=null;
 
@@ -68,6 +74,7 @@ public class addContactActivity extends AppCompatActivity {
         etDateOfBirth= (EditText) findViewById(R.id.date_birth);
         etZipCode= (EditText) findViewById(R.id.zipcode);
         titleProfile= (TextView) findViewById(R.id.titleProfile);
+        photoImageView=(ImageView) findViewById(R.id.photoImageView);
 
 
         //Get data from intent if it was called by edit Contact button
@@ -88,6 +95,10 @@ public class addContactActivity extends AppCompatActivity {
             String phone = intent.getStringExtra("phone");
             String zipcode = intent.getStringExtra("zipcode");
             id= intent.getIntExtra("id",-1);
+            byte[] photoByteArray= intent.getByteArrayExtra("photo");
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(photoByteArray, 0, photoByteArray.length);
+            photoImageView.setImageBitmap(bitmap);
 
             etFirstName.setText(firstName);
             etLastName.setText(lastName);
@@ -106,10 +117,43 @@ public class addContactActivity extends AppCompatActivity {
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(addContactActivity.this);
+                CharSequence[] options= {"Take Photo", "Choose from gallery"};
+
+                builder.setTitle("Change Photo")
+                        .setItems(options, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                if(which==0){
+                                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                                    }
+
+                                }
+
+                                else if(which==1){
+                                    //Opens File Chooser
+                                    Intent intent = new Intent();
+                                    intent.setType("image/*");
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+
+
+                                }
+
+                            }
+                        });
+                builder.show();
+
+
+
+
+
+
+
+
             }
         });
 
@@ -180,6 +224,11 @@ public class addContactActivity extends AppCompatActivity {
                     values.put(ContactsContract.contactEntry.COLUMN_PHONE,phoneNumber );
                     values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, zipCode );
 
+                    if(photoByteArray!=null){
+                        values.put(ContactsContract.contactEntry.COLUMN_PHOTO, photoByteArray );
+
+                    }
+
 
                     db.update(ContactsContract.contactEntry.TABLE_NAME,values, "_id="+id,null);
 
@@ -212,7 +261,7 @@ public class addContactActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==3){
+        if(requestCode==3 ){
             Uri imageUri = data.getData();
             Bitmap bitmap = null;
             try {
@@ -227,6 +276,17 @@ public class addContactActivity extends AppCompatActivity {
 
             photoByteArray = getBitmapAsByteArray(bitmap);
 
+
+
+        }
+
+        if(requestCode==4){
+
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            profilePhoto.setImageBitmap(imageBitmap);
+
+            photoByteArray = getBitmapAsByteArray(imageBitmap);
 
 
         }

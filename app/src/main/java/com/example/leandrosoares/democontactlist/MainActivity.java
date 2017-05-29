@@ -268,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("birthday",contact.getDateOfBirth());
                 intent.putExtra("phone",contact.getPhoneNumber());
                 intent.putExtra("zipcode",contact.getZipCode());
+                intent.putExtra("photo",contact.getPhotoByteArray());
                 intent.putExtra("id", rowID);
 
 
