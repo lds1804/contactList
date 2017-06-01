@@ -300,7 +300,7 @@ public class addContactActivity extends AppCompatActivity {
     //Compress the bitmap and returns it as a byte array
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
         return outputStream.toByteArray();
     }
 }
