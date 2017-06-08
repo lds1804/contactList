@@ -1,7 +1,7 @@
 # contactList
 A simple contact list in android, with CRUD functionalities
 
-![](https://giphy.com/gifs/3o7btPCR86UJ0lteBG)
+![](https://media.giphy.com/media/3o7btPCR86UJ0lteBG/giphy.gif)
 
 
 
