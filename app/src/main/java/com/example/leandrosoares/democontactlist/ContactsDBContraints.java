@@ -6,10 +6,10 @@ import android.provider.BaseColumns;
  * Created by leandrosoares on 24/05/17.
  * Class to store table name and columns of the table contacts
  */
-public final class ContactsContract {
+public final class ContactsDBContraints {
     // To prevent someone from accidentally instantiating the contract class,
     // make the constructor private.
-    private ContactsContract() {}
+    private ContactsDBContraints() {}
 
     /* Inner class that defines the table contents */
     public static class contactEntry implements BaseColumns {

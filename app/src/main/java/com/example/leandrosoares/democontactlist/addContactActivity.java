@@ -1,5 +1,6 @@
 package com.example.leandrosoares.democontactlist;
 
+import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,7 +18,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.PhoneNumberUtils;
+import android.text.Editable;
 import android.text.Layout;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,8 +31,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.i18n.phonenumbers.AsYouTypeFormatter;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 public class addContactActivity extends AppCompatActivity {
 
@@ -51,6 +64,8 @@ public class addContactActivity extends AppCompatActivity {
 
     private int PICK_IMAGE=3;
     final int REQUEST_IMAGE_CAPTURE = 4;
+
+    private TextWatcher textWatcher;
 
     byte[] photoByteArray=null;
 
@@ -192,17 +207,17 @@ public class addContactActivity extends AppCompatActivity {
 
                     //Put the values
                     ContentValues values = new ContentValues();
-                    values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,firstName );
-                    values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, lastName);
-                    values.put(ContactsContract.contactEntry.COLUMN_BIRTH, dateOfBirth);
-                    values.put(ContactsContract.contactEntry.COLUMN_PHONE,phoneNumber );
-                    values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, zipCode );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,firstName );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME, lastName);
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_BIRTH, dateOfBirth);
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_PHONE,phoneNumber );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE, zipCode );
 
 
                     if(photoByteArray!=null)
-                        values.put(ContactsContract.contactEntry.COLUMN_PHOTO, photoByteArray );
+                        values.put(ContactsDBContraints.contactEntry.COLUMN_PHOTO, photoByteArray );
 
-                    db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+                    db.insert(ContactsDBContraints.contactEntry.TABLE_NAME, null, values);
                     setResult(1);
                     finish();
 
@@ -221,19 +236,19 @@ public class addContactActivity extends AppCompatActivity {
 
 
                     ContentValues values = new ContentValues();
-                    values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,firstName );
-                    values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, lastName);
-                    values.put(ContactsContract.contactEntry.COLUMN_BIRTH, dateOfBirth);
-                    values.put(ContactsContract.contactEntry.COLUMN_PHONE,phoneNumber );
-                    values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, zipCode );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,firstName );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME, lastName);
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_BIRTH, dateOfBirth);
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_PHONE,phoneNumber );
+                    values.put(ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE, zipCode );
 
                     if(photoByteArray!=null){
-                        values.put(ContactsContract.contactEntry.COLUMN_PHOTO, photoByteArray );
+                        values.put(ContactsDBContraints.contactEntry.COLUMN_PHOTO, photoByteArray );
 
                     }
 
 
-                    db.update(ContactsContract.contactEntry.TABLE_NAME,values, "_id="+id,null);
+                    db.update(ContactsDBContraints.contactEntry.TABLE_NAME,values, "_id="+id,null);
 
 
                     setResult(2);
@@ -254,6 +269,56 @@ public class addContactActivity extends AppCompatActivity {
 
             }
         });
+
+
+        this.etPhoneNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+
+//        textWatcher = new TextWatcher(){
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count,
+//                                          int after) {
+//
+//            }
+//
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before,
+//                                      int count) {
+//
+//                PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+//
+//
+//                etPhoneNumber.removeTextChangedListener(textWatcher);//after this line you do the editing code
+//                String phoneNumberRaw=etPhoneNumber.getText().toString();
+//                String locale= Locale.getDefault().getCountry();
+//                Phonenumber.PhoneNumber numberProto = null;
+//
+//                AsYouTypeFormatter asYouTypeFormatter=phoneUtil.getAsYouTypeFormatter(locale);
+//                asYouTypeFormatter.inputDigit()
+//
+//                try {
+//                    numberProto = phoneUtil.parse(phoneNumberRaw, locale);
+//                } catch (NumberParseException e) {
+//                    e.printStackTrace();
+//                }
+//                //Since you know the country you can format it as follows:
+//                etPhoneNumber.setText(phoneUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+//
+//                etPhoneNumber.addTextChangedListener(textWatcher); // you register again for listener callbacks
+//
+//            }};
+//
+//        etPhoneNumber.addTextChangedListener(textWatcher);
+
+
+
 
 
 

@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
  * Created by leandrosoares on 24/05/17.
  */
 
-import  com.example.leandrosoares.democontactlist.ContactsContract;
+import  com.example.leandrosoares.democontactlist.ContactsDBContraints;
 
 import java.util.ArrayList;
 
@@ -29,24 +29,24 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
     //Query to create the table
     private static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE IF NOT EXISTS " + ContactsContract.contactEntry.TABLE_NAME + " (" +
-                    ContactsContract.contactEntry._ID + " INTEGER PRIMARY KEY," +
-                    ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_LAST_NAME + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_BIRTH + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_PHONE + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_ZIP_CODE + TEXT_TYPE + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_PHOTO + BLOB_TYPE +
+            "CREATE TABLE IF NOT EXISTS " + ContactsDBContraints.contactEntry.TABLE_NAME + " (" +
+                    ContactsDBContraints.contactEntry._ID + " INTEGER PRIMARY KEY," +
+                    ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME + TEXT_TYPE + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_LAST_NAME + TEXT_TYPE + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_BIRTH + TEXT_TYPE + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_PHONE + TEXT_TYPE + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE + TEXT_TYPE + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_PHOTO + BLOB_TYPE +
                     ") ;";
 
     private static final String SQL_SELECT_ALL_NAMES=
-            "SELECT  + " + ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME + COMMA_SEP +
-                    ContactsContract.contactEntry.COLUMN_LAST_NAME +
-                    " FROM " + ContactsContract.contactEntry.TABLE_NAME + ";";
+            "SELECT  + " + ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME + COMMA_SEP +
+                    ContactsDBContraints.contactEntry.COLUMN_LAST_NAME +
+                    " FROM " + ContactsDBContraints.contactEntry.TABLE_NAME + ";";
 
     //Query to delete entries
     private static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + ContactsContract.contactEntry.TABLE_NAME;
+            "DROP TABLE IF EXISTS " + ContactsDBContraints.contactEntry.TABLE_NAME;
 
 
     public static final int DATABASE_VERSION = 1;
@@ -84,9 +84,9 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
         //Set which columns will be selected
         String[] projection = {
-                ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
-                ContactsContract.contactEntry.COLUMN_LAST_NAME,
-                ContactsContract.contactEntry._ID
+                ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,
+                ContactsDBContraints.contactEntry.COLUMN_LAST_NAME,
+                ContactsDBContraints.contactEntry._ID
 
         };
 
@@ -94,12 +94,12 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
         // Set how the results will be sorted
         String sortOrder =
-                ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME+ " ASC";
+                ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME+ " ASC";
 
 
         //Queries the database
         Cursor c = db.query(
-                ContactsContract.contactEntry.TABLE_NAME,                     // The table to query
+                ContactsDBContraints.contactEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -112,10 +112,10 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         //iterates through the results using cursor and adds to the list items
         while (c.moveToNext()) {
 
-            String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
-            String last_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_LAST_NAME));
+            String first_name=c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME));
+            String last_name=c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME));
 
-            int  id=c.getInt(c.getColumnIndexOrThrow(ContactsContract.contactEntry._ID));
+            int  id=c.getInt(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry._ID));
 
             Log.d("Teste", first_name);
 
@@ -145,19 +145,19 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
         //The fields to be returned
         String[] projection = {
-                ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,
-                ContactsContract.contactEntry.COLUMN_LAST_NAME,
-                ContactsContract.contactEntry.COLUMN_PHONE,
-                ContactsContract.contactEntry.COLUMN_BIRTH,
-                ContactsContract.contactEntry.COLUMN_ZIP_CODE,
-                ContactsContract.contactEntry.COLUMN_PHOTO
+                ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,
+                ContactsDBContraints.contactEntry.COLUMN_LAST_NAME,
+                ContactsDBContraints.contactEntry.COLUMN_PHONE,
+                ContactsDBContraints.contactEntry.COLUMN_BIRTH,
+                ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE,
+                ContactsDBContraints.contactEntry.COLUMN_PHOTO
 
 
         };
 
         //Where clause to be used on the query
         String whereClause =
-                ContactsContract.contactEntry._ID + " = " + " ? " ;
+                ContactsDBContraints.contactEntry._ID + " = " + " ? " ;
 
 
         //Arguments used on the where clause
@@ -170,7 +170,7 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
 
 
         Cursor c = db.query(
-                ContactsContract.contactEntry.TABLE_NAME,                     // The table to query
+                ContactsDBContraints.contactEntry.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
                 whereClause,                                // The columns for the WHERE clause
                 whereArgs,                            // The values for the WHERE clause
@@ -182,17 +182,17 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
         //Store the value of the query on contact
         while (c.moveToNext()) {
 
-            String first_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME));
-            String last_name=c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_LAST_NAME));
-            String phoneNumber= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_PHONE));
-            String dateBirth= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_BIRTH));
-            String zipCode= c.getString(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_ZIP_CODE));
-            byte[] photoByteArray=c.getBlob(c.getColumnIndexOrThrow(ContactsContract.contactEntry.COLUMN_PHOTO));
+            String first_name=c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME));
+            String last_name=c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME));
+            String phoneNumber= c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_PHONE));
+            String dateBirth= c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_BIRTH));
+            String zipCode= c.getString(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE));
+            byte[] photoByteArray=c.getBlob(c.getColumnIndexOrThrow(ContactsDBContraints.contactEntry.COLUMN_PHOTO));
 
             Log.d("Main" , first_name+ " " + last_name);
 
 
-            contact = new Contact(first_name,last_name,dateBirth,phoneNumber,zipCode,photoByteArray);
+           // contact = new Contact(name,last_name,dateBirth,phoneNumber,zipCode,photoByteArray);
 
         }
 
@@ -208,7 +208,7 @@ public class  ContactsDbHelper extends SQLiteOpenHelper {
      */
     public int deleteContact(int id, SQLiteDatabase db){
 
-        String table = ContactsContract.contactEntry.TABLE_NAME;
+        String table = ContactsDBContraints.contactEntry.TABLE_NAME;
         String whereClause = "_id=?";
         String[] whereArgs = new String[] { String.valueOf(id) };
         return db.delete(table, whereClause, whereArgs);

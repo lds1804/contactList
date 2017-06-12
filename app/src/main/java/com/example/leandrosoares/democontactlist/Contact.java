@@ -7,44 +7,36 @@ package com.example.leandrosoares.democontactlist;
  */
 public class Contact {
 
-    private String firstName;
-    private String lastName;
-    private String dateOfBirth;
+    private String name;
     private String phoneNumber;
-    private String zipCode;
+    private String email;
     private byte[] photoByteArray;
 
 
-    public Contact(String firstName, String lastName, String dateOfBirth, String phoneNumber, String zipCode,
+    public Contact(String name, String phoneNumber, String email,
     byte[] photoByte
     ){
-        this.firstName=firstName;
-        this.lastName=lastName;
-        this.dateOfBirth=dateOfBirth;
+        this.name=name;
         this.phoneNumber=phoneNumber;
-        this.zipCode=zipCode;
+        this.email=email;
         this.photoByteArray=photoByte;
 
     }
 
-    public String getDateOfBirth() {
-        return dateOfBirth;
+
+
+    public String getName() {
+        return name;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
 
-    public String getLastName() {
-        return lastName;
-    }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public String getZipCode() {
-        return zipCode;
+    public String getEmail() {
+        return email;
     }
 
     public byte[] getPhotoByteArray(){

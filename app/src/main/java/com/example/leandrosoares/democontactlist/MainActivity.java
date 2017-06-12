@@ -1,16 +1,22 @@
 package com.example.leandrosoares.democontactlist;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -33,16 +39,23 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,15 +78,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     private TextView tvFirstName;
-    private TextView tvLastName;
     private TextView tvPhoneNumber;
-    private TextView tvZipCode;
-    private TextView tvDateOfBirth;
+    private TextView tvEmail;
+
 
     private ImageView backgroundProfile;
     private ImageView nameIcon;
     private ImageView phoneIcon;
-    private ImageView zipCodeIcon;
+    private ImageView emailIcon;
     private ImageView starIcon;
 
 
@@ -91,9 +103,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
 
         context=this;
+
+
+
 
         //Get preferences to check if it is the first run
         prefs = getSharedPreferences("com.example.leandrosoares.democontactlist", MODE_PRIVATE);
@@ -107,6 +125,24 @@ public class MainActivity extends AppCompatActivity {
 
         //Get all the contacts on the database
         itemsContact=mDbContactsHelper.selectAllContacts(db);
+
+
+        //Get Contacts from the phone
+        itemsContact=getAllContactsNames();
+
+        //Organize list alphabetically
+        if (itemsContact.size() > 0) {
+            Collections.sort(itemsContact, new Comparator<RowItem>() {
+                @Override
+                public int compare(RowItem rowItem, RowItem t1) {
+                    return rowItem.getContactName().compareTo(t1.getContactName());
+                }
+
+
+            } );
+        }
+
+        //
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -128,16 +164,15 @@ public class MainActivity extends AppCompatActivity {
         listViewContacts = (ListView) findViewById(R.id.contactsListView);
         mSlidePanelLayout= (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         tvFirstName= (TextView) findViewById(R.id.tvFirstName);
-        tvLastName= (TextView) findViewById(R.id.tvLastName);
         tvPhoneNumber= (TextView) findViewById(R.id.tvPhoneNumber);
-        tvZipCode= (TextView) findViewById(R.id.tvZipCode);
-        tvDateOfBirth= (TextView) findViewById(R.id.tvDateBirth);
+        tvEmail= (TextView) findViewById(R.id.tvEmail);
+
 
 
         backgroundProfile=(ImageView) findViewById(R.id.backgroundProfile);
         nameIcon=(ImageView) findViewById(R.id.name_icon);
-        starIcon=(ImageView) findViewById(R.id.iconStar);
-        zipCodeIcon=(ImageView) findViewById(R.id.iconZipCode);
+
+        emailIcon=(ImageView) findViewById(R.id.iconEmail);
         phoneIcon=(ImageView) findViewById(R.id.iconPhone);
 
         removeContactMenuButton= (ImageButton) findViewById(R.id.menuRemoveContact);
@@ -163,14 +198,14 @@ public class MainActivity extends AppCompatActivity {
 
                 fab.setVisibility(View.INVISIBLE);
 
-                contact= mDbContactsHelper.selectContact(db,rowID);
+                contact= getContact(rowID,rowItem.getContactName());
 
                 //Fill the fields of the profile panel
-                tvFirstName.setText(contact.getFirstName());
-                tvLastName.setText(contact.getLastName());
+                tvFirstName.setText(contact.getName());
+
                 tvPhoneNumber.setText(contact.getPhoneNumber());
-                tvDateOfBirth.setText(contact.getDateOfBirth());
-                tvZipCode.setText(contact.getZipCode());
+
+                tvEmail.setText(contact.getEmail());
 
                 byte[] photoData=contact.getPhotoByteArray();
 
@@ -178,20 +213,29 @@ public class MainActivity extends AppCompatActivity {
                 if(photoData!=null) {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(photoData, 0, photoData.length);
                     backgroundProfile.setImageBitmap(bitmap);
+                    backgroundProfile.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+
+
+                }
+
+                else{
+
+                    backgroundProfile.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 }
 
 
                 ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
 
                 // generate color based on a key (same key returns the same color), useful for list/grid views
-                int color = generator.getColor(contact.getFirstName()+" "+ contact.getLastName() );
+                int color = generator.getColor(contact.getName());
 
                 //Sets the color of the icons to the color generated
                 backgroundProfile.setBackgroundColor(color);
                 nameIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
                 phoneIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-                starIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-                zipCodeIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+
+                emailIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
 
             }
         });
@@ -263,11 +307,9 @@ public class MainActivity extends AppCompatActivity {
                 //Create activity to edit contact
                 Intent intent =new Intent(getApplicationContext(),addContactActivity.class);
 
-                intent.putExtra("firstName",contact.getFirstName());
-                intent.putExtra("lastName",contact.getLastName());
-                intent.putExtra("birthday",contact.getDateOfBirth());
+                intent.putExtra("name",contact.getName());
                 intent.putExtra("phone",contact.getPhoneNumber());
-                intent.putExtra("zipcode",contact.getZipCode());
+                intent.putExtra("email",contact.getEmail());
                 intent.putExtra("photo",contact.getPhotoByteArray());
                 intent.putExtra("id", rowID);
 
@@ -277,8 +319,181 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        tvPhoneNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String phone= (String) tvPhoneNumber.getText();
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone));
+                startActivity(intent);
+
+            }
+        });
+
+        phoneIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String phone= (String) tvPhoneNumber.getText();
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phone));
+                startActivity(intent);
+            }
+        });
+
 
     }
+
+    private Contact getContact(int rowID, String name) {
+
+
+        String phoneNumber="";
+        String email="";
+        byte[] photo=null;
+
+        ContentResolver cr = getContentResolver();
+
+        String[] PHONES_PROJECTION = new String[] { "_id","display_name","data1","data3"};//
+
+        //  Get all phone numbers.
+        Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PHONES_PROJECTION,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + rowID, null, null);
+
+
+        while (phones.moveToNext()) {
+
+            //TODO organizar telefones por tipo
+            phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+            //TODO removed by now
+//            int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+//            switch (type) {
+//                case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+//                    phoneNumber=number;
+//                    break;
+//                case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+//                    phoneNumber=number;
+//                    break;
+//                case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+//                    phoneNumber=number;
+//                    break;
+//            }
+        }
+        phones.close();
+
+
+
+
+        //email
+        Cursor emailCur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI ,
+                new String[]{"_id","data1","data2","data3"}, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + rowID , null, null);
+        while(emailCur.moveToNext()) {
+            int i = emailCur.getInt(0);
+            email = emailCur.getString(1);
+            email = emailCur.getString(2);
+            email = emailCur.getString(3);
+        }
+        emailCur.close();
+
+
+        //photo
+        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, rowID);
+        Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
+
+        AssetFileDescriptor fd = null;
+        try {
+            fd = getContentResolver().openAssetFileDescriptor(displayPhotoUri, "r");
+            InputStream inputStream=fd.createInputStream();
+            photo = readBytes(inputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        contact = new Contact(name,phoneNumber,email,photo);
+
+
+
+        return contact;
+
+
+
+    }
+
+
+
+    private void getAllContactsDetails() {
+
+
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        while(cursor.moveToNext()){
+            //get name
+            int nameFiledColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
+            String contact = cursor.getString(nameFiledColumnIndex);
+
+            String[] PHONES_PROJECTION = new String[] { "_id","display_name","data1","data3"};//
+            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+            Cursor phone = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PHONES_PROJECTION,
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + contactId, null, null);
+            //name type ..
+            while(phone.moveToNext()) {
+                int i = phone.getInt(0);
+                String str = phone.getString(1);
+                String phoneNumberString = phone.getString(2);
+                String email = phone.getString(3);
+            }
+            phone.close();
+            //addr
+            Cursor addrCur = cr.query(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI ,
+                    new String[]{"_id","data1","data2","data3"}, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + contactId , null, null);
+            while(addrCur.moveToNext()) {
+                int i = addrCur.getInt(0);
+                String str = addrCur.getString(1);
+                str = addrCur.getString(2);
+                str = addrCur.getString(3);
+            }
+            addrCur.close();
+
+            //email
+            Cursor emailCur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI ,
+                    new String[]{"_id","data1","data2","data3"}, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + contactId , null, null);
+            while(emailCur.moveToNext()) {
+                int i = emailCur.getInt(0);
+                String str = emailCur.getString(1);
+                str = emailCur.getString(2);
+                str = emailCur.getString(3);
+            }
+            emailCur.close();
+
+        }
+        cursor.close();
+    }
+
+    private ArrayList<RowItem> getAllContactsNames() {
+
+
+        ArrayList<RowItem> listContacts= new ArrayList<>();
+
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        while(cursor.moveToNext()){
+            //get name
+            int nameFiledColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
+            String contact = cursor.getString(nameFiledColumnIndex);
+            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+
+            RowItem rowItem= new RowItem(contact, Integer.valueOf(contactId));
+
+            listContacts.add(rowItem);
+
+
+
+        }
+        cursor.close();
+
+        return listContacts;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -317,107 +532,107 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Adds dummy contacts to the database
-    private void addDummyContactsDB(SQLiteDatabase db) {
-
-        ContentValues values = new ContentValues();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Maria" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Silva");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1996-04-22");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Beyonce" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Joaquina");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Chris" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Rock");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Dominguinhos" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "do Rojao");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Jack Bauer" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "de Jesus");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Jose" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Dirceu");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Leandro" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Soares");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Lula" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "da Silva");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-
-        values.clear();
-        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Rihana" );
-        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Umbrella");
-        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
-        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
-        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
-
-
-        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
-
-
-    }
+//    private void addDummyContactsDB(SQLiteDatabase db) {
+//
+//        ContentValues values = new ContentValues();
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,"Maria" );
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME, "Silva");
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_BIRTH, "1996-04-22");
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsDBContraints.contactEntry.TABLE_NAME, null, values);
+//
+//
+//        values.clear();
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,"Beyonce" );
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME, "Joaquina");
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsDBContraints.contactEntry.TABLE_NAME, null, values);
+//
+//        values.clear();
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_NAME_FIRST_NAME,"Chris" );
+//        values.put(ContactsDBContraints.contactEntry.COLUMN_LAST_NAME, "Rock");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Dominguinhos" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "do Rojao");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Jack Bauer" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "de Jesus");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Jose" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Dirceu");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Leandro" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Soares");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Lula" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "da Silva");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//
+//        values.clear();
+//        values.put(ContactsContract.contactEntry.COLUMN_NAME_FIRST_NAME,"Rihana" );
+//        values.put(ContactsContract.contactEntry.COLUMN_LAST_NAME, "Umbrella");
+//        values.put(ContactsContract.contactEntry.COLUMN_BIRTH, "1997-05-12");
+//        values.put(ContactsContract.contactEntry.COLUMN_PHONE,"(12)3921-8503" );
+//        values.put(ContactsContract.contactEntry.COLUMN_ZIP_CODE, "02832-000" );
+//
+//
+//        db.insert(ContactsContract.contactEntry.TABLE_NAME, null, values);
+//
+//
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -461,10 +676,29 @@ public class MainActivity extends AppCompatActivity {
 
         //checks if it is the first run
         if (prefs.getBoolean("firstrun", true)) {
-            addDummyContactsDB(db);
+            //addDummyContactsDB(db);
             refreshListView();
             prefs.edit().putBoolean("firstrun", false).commit();
         }
+    }
+
+
+    public byte[] readBytes(InputStream inputStream) throws IOException {
+        // this dynamically extends to take the bytes you read
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+        // this is storage overwritten on each iteration with bytes
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        // we need to know how may bytes were read to write them to the byteBuffer
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+
+        // and then we can return your byte array.
+        return byteBuffer.toByteArray();
     }
 
 }
